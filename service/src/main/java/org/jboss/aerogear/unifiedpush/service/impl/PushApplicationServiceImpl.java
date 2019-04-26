@@ -23,11 +23,13 @@ import org.jboss.aerogear.unifiedpush.service.PushApplicationService;
 import org.jboss.aerogear.unifiedpush.service.annotations.LoggedIn;
 
 import javax.ejb.Stateless;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import java.util.Map;
 
 @Stateless
+@Default
 public class PushApplicationServiceImpl implements PushApplicationService {
 
     @Inject

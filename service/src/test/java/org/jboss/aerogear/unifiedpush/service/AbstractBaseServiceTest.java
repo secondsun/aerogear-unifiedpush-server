@@ -16,25 +16,15 @@
  */
 package org.jboss.aerogear.unifiedpush.service;
 
-import org.apache.openejb.jee.Beans;
-import org.apache.openejb.junit.ApplicationComposer;
-import org.apache.openejb.mockito.MockitoInjector;
-import org.apache.openejb.testing.MockInjector;
-import org.apache.openejb.testing.Module;
-import org.jboss.aerogear.unifiedpush.jpa.dao.impl.JPAFlatPushMessageInformationDao;
-import org.jboss.aerogear.unifiedpush.jpa.dao.impl.JPACategoryDao;
-import org.jboss.aerogear.unifiedpush.jpa.dao.impl.JPAInstallationDao;
-import org.jboss.aerogear.unifiedpush.jpa.dao.impl.JPAVariantDao;
-import org.jboss.aerogear.unifiedpush.jpa.dao.impl.JPAPushApplicationDao;
-import org.jboss.aerogear.unifiedpush.service.impl.ClientInstallationServiceImpl;
-import org.jboss.aerogear.unifiedpush.service.impl.GenericVariantServiceImpl;
 import org.jboss.aerogear.unifiedpush.service.impl.PushApplicationServiceImpl;
 import org.jboss.aerogear.unifiedpush.service.impl.PushSearchByDeveloperServiceImpl;
-import org.jboss.aerogear.unifiedpush.service.impl.PushSearchServiceImpl;
 import org.jboss.aerogear.unifiedpush.service.impl.SearchManager;
-import org.jboss.aerogear.unifiedpush.service.metrics.PushMessageMetricsService;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.InitializationError;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
@@ -53,7 +43,7 @@ import java.io.Serializable;
 
 import static org.mockito.Mockito.when;
 
-@RunWith(ApplicationComposer.class)
+@RunWith(AbstractBaseServiceTest.WeldJUnit4Runner.class)
 public abstract class AbstractBaseServiceTest {
 
     @Mock
@@ -80,10 +70,10 @@ public abstract class AbstractBaseServiceTest {
      * Basic setup stuff, needed for all the UPS related service classes
      */
     @Before
-    public void setUp(){
+    public void setUp() {
         // Keycloak test environment
         AccessToken token = new AccessToken();
-        //The current developer will always be the admin in this testing scenario
+        // The current developer will always be the admin in this testing scenario
         token.setPreferredUsername("admin");
         when(context.getToken()).thenReturn(token);
         when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(context);
@@ -97,41 +87,10 @@ public abstract class AbstractBaseServiceTest {
     }
 
     /**
-     * Enforced to override to make sure test-case specific
-     * setup is done inside here!
+     * Enforced to override to make sure test-case specific setup is done inside
+     * here!
      */
     protected abstract void specificSetup();
-
-    // ===================== OpenEJB hooks and base methods =====================
-
-    @MockInjector
-    public Class<?> mockitoInjector() {
-        return MockitoInjector.class;
-    }
-
-    @Module
-    public Beans getBeans() {
-        final Beans beans = new Beans();
-        beans.addManagedClass(ClientInstallationServiceImpl.class);
-        beans.addManagedClass(JPAFlatPushMessageInformationDao.class);
-        beans.addManagedClass(JPAInstallationDao.class);
-        beans.addManagedClass(GenericVariantServiceImpl.class);
-        beans.addManagedClass(JPAVariantDao.class);
-        beans.addManagedClass(JPACategoryDao.class);
-        beans.addManagedClass(PushSearchByDeveloperServiceImpl.class);
-        beans.addManagedClass(PushApplicationServiceImpl.class);
-        beans.addManagedClass(JPAPushApplicationDao.class);
-        beans.addManagedClass(PushSearchServiceImpl.class);
-        beans.addManagedClass(SearchManager.class);
-        beans.addManagedClass(PushMessageMetricsService.class);
-
-        return beans;
-    }
-
-    @Module
-    public Class<?>[] produceTestEntityManager() throws Exception {
-        return new Class<?>[] { EntityManagerProducer.class};
-    }
 
     /**
      * Static class to have OpenEJB produce/lookup a test EntityManager.
@@ -150,7 +109,7 @@ public abstract class AbstractBaseServiceTest {
         @Produces
         public EntityManager produceEm() {
 
-            if (! entityManager.getTransaction().isActive()) {
+            if (!entityManager.getTransaction().isActive()) {
                 entityManager.getTransaction().begin();
             }
 
@@ -163,6 +122,42 @@ public abstract class AbstractBaseServiceTest {
                 entityManager.getTransaction().commit();
                 entityManager.close();
             }
+        }
+    }
+
+    public static class WeldJUnit4Runner extends BlockJUnit4ClassRunner {
+
+        public WeldJUnit4Runner(Class<Object> clazz) throws InitializationError {
+            super(clazz);
+        }
+    
+        @Override
+        protected Object createTest() {
+            final Class<?> test = getTestClass().getJavaClass();
+            return WeldContext.INSTANCE.getBean(test);
+        }
+    }
+
+    public static class WeldContext {
+
+        public static final WeldContext INSTANCE = new WeldContext();
+    
+        private final Weld weld;
+        private final WeldContainer container;
+    
+        private WeldContext() {
+            this.weld = new Weld();
+            this.container = weld.initialize();
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    weld.shutdown();
+                }
+            });
+        }
+    
+        public <T> T getBean(Class<T> type) {
+            return container.instance().select(type).get();
         }
     }
 }
