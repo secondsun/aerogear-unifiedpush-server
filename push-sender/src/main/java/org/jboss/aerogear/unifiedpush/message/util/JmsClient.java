@@ -47,7 +47,7 @@ public class JmsClient {
     @Resource(mappedName = "java:/ConnectionFactory")
     private ConnectionFactory connectionFactory;
 
-    @Resource(mappedName = "java:/JmsXA")
+    @Resource(mappedName = "java:/jms/remoteXA")
     private ConnectionFactory xaConnectionFactory;
 
     /**
