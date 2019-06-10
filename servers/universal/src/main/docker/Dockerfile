@@ -43,4 +43,4 @@ COPY config/ $JBOSS_HOME/bin
 EXPOSE 8080
 
 COPY entrypoint.sh /opt/
-ENTRYPOINT ["/opt/entrypoint.sh"]
+ENTRYPOINT ["sh","-c","/opt/entrypoint.sh"]
