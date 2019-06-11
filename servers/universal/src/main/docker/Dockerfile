@@ -39,6 +39,8 @@ COPY maven/ $JBOSS_HOME/standalone/deployments
 
 COPY config/ $JBOSS_HOME/bin
 
+RUN  sed -i "s/<resolve-parameter-values>false<\/resolve-parameter-values>/<resolve-parameter-values>true<\/resolve-parameter-values>/" $JBOSS_HOME/bin/jboss-cli.xml
+
 # Expose default port
 EXPOSE 8080
 

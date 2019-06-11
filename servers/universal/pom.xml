@@ -48,7 +48,7 @@
             <version>${admin-ui.version}</version>
             <scope>compile</scope>
         </dependency>
-
+<!-- 
 
         <dependency>
           <groupId>org.keycloak</groupId>
@@ -67,7 +67,7 @@
                   <artifactId>jackson-xc</artifactId>
               </exclusion>
           </exclusions>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -81,7 +81,7 @@
     <repositories>
         <repository>
             <id>JBOSS_NEXUS</id>
-            <url>http://repository.jboss.org/nexus/content/groups/public</url>
+            <url>https://repository.jboss.org/nexus/content/groups/public</url>
         </repository>
     </repositories>
 
