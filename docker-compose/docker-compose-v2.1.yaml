@@ -9,14 +9,18 @@ services:
     depends_on:
        unifiedpushDB:
          condition: service_healthy
-    environment:
-        POSTGRES_SERVICE_HOST: ${POSTGRES_SERVICE_HOST}
-        POSTGRES_USER: ${POSTGRES_USER}
-        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        POSTGRES_SERVICE_PORT: ${POSTGRES_SERVICE_PORT}
-        POSTGRES_DATABASE: ${POSTGRES_DATABASE}
-        KEYCLOAK_SERVICE_HOST: ${KEYCLOAK_SERVICE_HOST}
-        KEYCLOAK_SERVICE_PORT: ${KEYCLOAK_SERVICE_PORT}
+#    environment:
+#        POSTGRES_SERVICE_HOST: ${POSTGRES_SERVICE_HOST}
+#        POSTGRES_USER: ${POSTGRES_USER}
+#        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#        POSTGRES_SERVICE_PORT: ${POSTGRES_SERVICE_PORT}
+#        POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+#        KEYCLOAK_SERVICE_HOST: ${KEYCLOAK_SERVICE_HOST}
+#        KEYCLOAK_SERVICE_PORT: ${KEYCLOAK_SERVICE_PORT}
+#        ARTEMIS_USER: ${ARTEMIS_USER}
+#        ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD}
+#        ARTEMIS_SERVICE_HOST: ${ARTEMIS_SERVICE_HOST}
+#        ARTEMIS_SERVICE_PORT: ${ARTEMIS_SERVICE_PORT}
     links:
       - unifiedpushDB:unifiedpush
       - artemis:artemis
@@ -42,6 +46,9 @@ services:
       KEYCLOAK_USER: ${KEYCLOAK_USER}
       KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
   artemis:
+    environment:
+      ARTEMIS_USERNAME: ${ARTEMIS_USER}
+      ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD}
     image: vromero/activemq-artemis
     volumes:
       - ./artemis-overrides:/var/lib/artemis/etc-override:z

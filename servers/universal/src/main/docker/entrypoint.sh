@@ -18,7 +18,7 @@ else
   /opt/jboss/wildfly/bin/jboss-cli.sh --file=/opt/jboss/wildfly/bin/create-ups-h2-inmemory-ds.cli --properties=$JBOSS_HOME/env.properties
 fi
 
-if [ !  -z "${AMQ_SERVICE_HOST}" ]; then
+if [ !  -z "${ARTEMIS_SERVICE_HOST}" ]; then
   echo "Remote AMQ"
   /opt/jboss/wildfly/bin/jboss-cli.sh --file=/opt/jboss/wildfly/bin/create-queues-with-artemis.cli --properties=$JBOSS_HOME/env.properties
   cp /opt/jboss/wildfly/bin/jboss-ejb3.xml.artemis /opt/jboss/wildfly/standalone/deployments/ROOT/WEB-INF/jboss-ejb3.xml

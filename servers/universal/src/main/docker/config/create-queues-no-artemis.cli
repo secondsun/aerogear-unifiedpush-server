@@ -37,4 +37,12 @@ embed-server --server-config=${server.config:standalone.xml}
 
 
 /subsystem=messaging-activemq/server=default/jms-topic=MetricsProcessingStartedTopic:add(entries=[topic/MetricsProcessingStartedTopic])
-/subsystem=messaging-activemq/server=default/jms-topic=topic/APNSClient:add(entries=[java:/topic/APNSClient])
+/subsystem=messaging-activemq/server=default/jms-topic=APNSClient:add(entries=[topic/APNSClient])
+
+
+/subsystem=messaging-activemq/server=default/connection-factory=InVmConnectionFactory:remove
+/subsystem=messaging-activemq/server=default/connection-factory=InVmConnectionFactory:add(entries=[ConnectionFactory], connectors=[in-vm])
+/subsystem=messaging-activemq/server=default/pooled-connection-factory=activemq-ra:remove
+/subsystem=messaging-activemq/server=default/pooled-connection-factory=activemq-ra:add(entries=[java:/jms/remoteXA, java:/JmsXA, java:jboss/DefaultJMSConnectionFactory], connectors=[in-vm], transaction=xa)
+/subsystem=messaging-activemq/server=default/connection-factory=RemoteConnectionFactory:remove
+/subsystem=messaging-activemq/server=default/connection-factory=RemoteConnectionFactory:add(entries=[java:jboss/exported/jms/RemoteConnectionFactory], connectors=[http-connector])
